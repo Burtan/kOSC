@@ -1,0 +1,102 @@
+stages:
+  - build
+  - test
+  - stage
+
+# android and jvm builds
+
+.android-job:
+  when: always
+  image: cimg/android:2024.01.1
+  tags:
+    - linux
+  before_script:
+    - sh ./ci/linux-android-install.sh
+
+build-android:
+  stage: build
+  extends: .android-job
+  script:
+    - ./gradlew assemble
+  artifacts:
+    paths:
+      - ./*/build/*
+    expire_in: 1 days
+
+test-android:
+  stage: test
+  extends: .android-job
+  needs:
+    - build-android
+  script:
+    - ./gradlew test
+    - ./gradlew jvmTest
+
+# web builds
+
+.web-job:
+  when: always
+  image: debian:bookworm-backports
+  tags:
+    - linux
+  before_script:
+    - sh ./ci/linux-web-install.sh
+  
+build-web:
+  stage: build
+  extends: .web-job
+  script:
+    - ./gradlew jsJar
+  artifacts:
+    paths:
+      - ./*/build/*
+    expire_in: 1 days
+
+test-web:
+  stage: test
+  extends: .web-job
+  needs:
+    - build-web
+  script:
+    - export CHROME_BIN=chromium
+    - export SAFARI_BIN=epiphany-browser
+    - export FIREFOX_BIN=firefox-devedition
+    - ./gradlew jsTest
+
+# iOS builds
+
+.ios-job:
+  when: always
+  tags:
+    - macos
+
+build-ios:
+  stage: build
+  extends: .ios-job
+  script:
+    - ./gradlew iosArm64MainKlibrary
+    - ./gradlew iosSimulatorArm64MainKlibrary
+    - ./gradlew iosX64MainKlibrary
+  artifacts:
+    paths:
+      - ./*/build/*
+    expire_in: 1 days
+
+test-ios:
+  stage: test
+  extends: .ios-job
+  needs:
+    - build-ios
+  script:
+    - ./gradlew iosX64Test
+
+#### RELEASE ####
+
+stage-ios:
+  stage: stage
+  tags:
+    - macos
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - ./gradlew publish
