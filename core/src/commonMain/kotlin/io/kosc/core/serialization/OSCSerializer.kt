@@ -11,6 +11,36 @@ import kotlinx.io.writeFloat
 
 object OSCSerializer {
 
+    @OptIn(ExperimentalStdlibApi::class)
+    fun deserialize(buffer: Buffer): OSCPacket {
+        buffer.peek().use { peek ->
+            return when (peek.readByte()) {
+                // first byte # means OSCBundle
+                35.toByte() -> readOSCBundle(buffer)
+                // otherwise it's an OSCMessage
+                else -> readOSCMessage(buffer)
+            }
+        }
+    }
+
+    private fun readOSCMessage(buffer: Buffer): OSCMessage {
+
+    }
+
+    private fun readOSCBundle(buffer: Buffer): OSCBundle {
+        // skip #bundle
+        buffer.skip(7)
+        val timeTag = OSCTimeTag(buffer.readLong())
+        val packets = mutableListOf<OSCPacket>()
+        while (buffer.size >= 0) {
+            val packetSize = buffer.readInt()
+            val packetBuffer = Buffer()
+            buffer.readAtMostTo(packetBuffer, packetSize.toLong())
+            packets.add(deserialize(packetBuffer))
+        }
+    }
+
+
     fun serialize(obj: OSCPacket): ByteArray {
         val buffer = Buffer()
         serialize(buffer, obj)
