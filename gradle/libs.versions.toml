@@ -1,0 +1,22 @@
+[versions]
+agp = "8.2.2"
+coroutines = "1.8.0"
+kotlin = "1.9.23"
+kotest = "5.8.1"
+junit = "4.13.2"
+robolectric = "4.12.1"
+ktor = "2.3.10"
+kx-io = "0.3.3"
+
+[libraries]
+coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
+kotest-assertions-core = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
+ktor-network = { group = "io.ktor", name = "ktor-network", version.ref = "ktor" }
+kx-io = { group = "org.jetbrains.kotlinx", name = "kotlinx-io-core", version.ref = "kx-io" }
+
+[plugins]
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
