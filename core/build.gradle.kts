@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
+    alias(libs.plugins.kotest.multiplatform)
     id("maven-publish")
 }
 
@@ -37,15 +38,15 @@ kotlin {
         }
         commonTest {
             dependencies {
-                implementation(kotlin("test"))
+                implementation(libs.kotest.framework.datatest)
+                implementation(libs.kotest.framework.engine)
                 implementation(libs.kotest.assertions.core)
-                implementation(libs.coroutines.test)
             }
         }
-        val androidUnitTest by getting {
+
+        jvmTest {
             dependencies {
-                implementation(libs.junit)
-                implementation(libs.robolectric)
+                implementation(libs.kotest.runner.junit5)
             }
         }
     }
@@ -57,6 +58,15 @@ android {
     defaultConfig {
         minSdk = 21
     }
+    testOptions {
+        unitTests.all {
+            it.useJUnitPlatform()
+        }
+    }
+}
+
+tasks.named<Test>("jvmTest") {
+    useJUnitPlatform()
 }
 
 publishing {

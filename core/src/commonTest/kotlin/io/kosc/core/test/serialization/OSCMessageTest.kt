@@ -2,85 +2,45 @@ package io.kosc.core.test.serialization
 
 import io.kosc.core.serialization.OSCSerializer
 import io.kosc.core.spec.OSCMessage
-import io.kosc.core.spec.args.OSCBlob
+import io.kosc.core.spec.OSCPacket
 import io.kosc.core.spec.args.OSCFloat32
 import io.kosc.core.spec.args.OSCInt32
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.datatest.withData
 import io.kotest.matchers.shouldBe
-import kotlin.test.Test
+import kotlinx.io.Buffer
 
 
-class OSCMessageTest {
+class OSCMessageTest : StringSpec() {
 
-    @Test
-    fun testEmpty() {
-        val message = OSCMessage("/empty")
-        val answer = byteArrayOf(47, 101, 109, 112, 116, 121, 0, 0, 44, 0, 0, 0)
-        val result = OSCSerializer.serialize(message)
-        result shouldBe answer
+    private val data = listOf(
+        // empty message
+        OSCMessage("/empty") to byteArrayOf(47, 101, 109, 112, 116, 121, 0, 0, 44, 0, 0, 0),
+        // FillerBeforeCommaNone
+        OSCMessage("/abcdef") to byteArrayOf(47, 97, 98, 99, 100, 101, 102, 0, 44, 0, 0, 0),
+        // FillerBeforeCommaOne
+        OSCMessage("/abcde") to byteArrayOf(47, 97, 98, 99, 100, 101, 0, 0, 44, 0, 0, 0),
+        // FillerBeforeCommaTwo
+        OSCMessage("/abcd") to byteArrayOf(47, 97, 98, 99, 100, 0, 0, 0, 44, 0, 0, 0),
+        // FillerBeforeCommaThree
+        OSCMessage("/abcdefg") to byteArrayOf(47, 97, 98, 99, 100, 101, 102, 103, 0, 0, 0, 0, 44, 0, 0, 0),
+        // ArgumentInteger
+        OSCMessage("/int", OSCInt32(99)) to byteArrayOf(47, 105, 110, 116, 0, 0, 0, 0, 44, 105, 0, 0, 0, 0, 0, 99),
+        // ArgumentFloat
+        OSCMessage("/float", OSCFloat32(999.9f)) to byteArrayOf(47, 102, 108, 111, 97, 116, 0, 0, 44, 102, 0, 0, 68, 121, -7, -102),
+    )
+
+    init {
+        withData(data) { (message, stream) ->
+            OSCSerializer.serialize(message) shouldBe stream
+            OSCSerializer.deserialize(stream) shouldBe message
+        }
     }
 
-    @Test
-    fun testFillerBeforeCommaNone() {
-        val message = OSCMessage("/abcdef")
-        // here we only have the addresses string terminator (0) before the ',' (44),
-        // so the comma is 4 byte aligned
-        val answer = byteArrayOf(47, 97, 98, 99, 100, 101, 102, 0, 44, 0, 0, 0)
-        val result = OSCSerializer.serialize(message)
-        result shouldBe answer
-    }
-
-    @Test
-    fun testFillerBeforeCommaOne() {
-        val message = OSCMessage("/abcde")
-        // here we have one padding 0 after the addresses string terminator (also 0)
-        // and before the ',' (44), so the comma is 4 byte aligned
-        val answer = byteArrayOf(47, 97, 98, 99, 100, 101, 0, 0, 44, 0, 0, 0)
-        val result = OSCSerializer.serialize(message)
-        result shouldBe answer
-    }
-
-    @Test
-    fun testFillerBeforeCommaTwo() {
-        val message = OSCMessage("/abcd")
-        // here we have two padding 0's after the addresses string terminator (also 0)
-        // and before the ',' (44), so the comma is 4 byte aligned
-        val answer = byteArrayOf(47, 97, 98, 99, 100, 0, 0, 0, 44, 0, 0, 0)
-        val result = OSCSerializer.serialize(message)
-        result shouldBe answer
-    }
-
-    @Test
-    fun testFillerBeforeCommaThree() {
-        val message = OSCMessage("/abcdefg")
-        // here we have three padding 0's after the addresses string terminator (also 0)
-        // and before the ',' (44), so the comma is 4 byte aligned
-        val answer = byteArrayOf(47, 97, 98, 99, 100, 101, 102, 103, 0, 0, 0, 0, 44, 0, 0, 0)
-        val result = OSCSerializer.serialize(message)
-        result shouldBe answer
-    }
-
-    @Test
-    fun testArgumentInteger() {
-        val message = OSCMessage("/int", OSCInt32(99))
-        val answer = byteArrayOf(47, 105, 110, 116, 0, 0, 0, 0, 44, 105, 0, 0, 0, 0, 0, 99)
-        val result = OSCSerializer.serialize(message)
-        result shouldBe answer
-    }
-
-    @Test
-    fun testArgumentFloat() {
-        val message = OSCMessage("/float", OSCFloat32(999.9f))
-        val answer = byteArrayOf(47, 102, 108, 111, 97, 116, 0, 0, 44, 102, 0, 0, 68, 121, -7, -102)
-        val result = OSCSerializer.serialize(message)
-        result shouldBe answer
-    }
-
-    @Test
-    fun testArgumentBlob() {
-        val message = OSCMessage("/blob", OSCBlob(byteArrayOf(-1, 0, 1)))
-        val answer = byteArrayOf(47, 98, 108, 111, 98, 0, 0, 0, 44, 98, 0, 0, 0, 0, 0, 3, -1, 0, 1, 0)
-        val result = OSCSerializer.serialize(message)
-        result shouldBe answer
+    private fun OSCSerializer.deserialize(byteArray: ByteArray): OSCPacket {
+        val buffer = Buffer()
+        buffer.write(byteArray)
+        return deserialize(buffer)
     }
 
 }
