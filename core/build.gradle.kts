@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
@@ -15,6 +17,7 @@ kotlin {
     }
     jvm()
     js {
+        useEsModules()
         browser {
             testTask {
                 useKarma {
@@ -45,6 +48,12 @@ kotlin {
         }
 
         jvmTest {
+            dependencies {
+                implementation(libs.kotest.runner.junit5)
+            }
+        }
+
+        val androidUnitTest by getting {
             dependencies {
                 implementation(libs.kotest.runner.junit5)
             }

@@ -31,6 +31,7 @@ object OSCSerializer {
             when (tag) {
                 'i' -> OSCInt32(buffer.readInt())
                 's' -> buffer.readOSCString()
+                // TODO readFloat does not work correctly on JS
                 'f' -> OSCFloat32(buffer.readFloat())
                 'b' -> buffer.readOSCBlob()
                 else -> throw IllegalArgumentException("Unrecognized tag: $tag")

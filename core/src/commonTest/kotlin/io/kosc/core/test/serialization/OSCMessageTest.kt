@@ -32,8 +32,10 @@ class OSCMessageTest : StringSpec() {
 
     init {
         withData(data) { (message, stream) ->
-            OSCSerializer.serialize(message) shouldBe stream
-            OSCSerializer.deserialize(stream) shouldBe message
+            val serializationResult = OSCSerializer.serialize(message)
+            val deserializationResult = OSCSerializer.deserialize(stream)
+            serializationResult shouldBe stream
+            deserializationResult shouldBe message
         }
     }
 
