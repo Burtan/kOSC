@@ -14,13 +14,59 @@ import kotlinx.io.Buffer
 class OSCBundleTest : StringSpec() {
 
     private val bundleData = listOf(
-        // edge cases
         OSCBundle(
             time = OSCTimeTag(131231L),
             packets = listOf(
                 OSCMessage(
                     address = "/msgstring",
                     argument = OSCString("bundletest")
+                )
+            )
+        ),
+        OSCBundle(
+            time = OSCTimeTag(131231L),
+            packets = listOf(
+                OSCMessage(
+                    address = "/msgstring",
+                    argument = OSCString("bundletest")
+                ),
+                OSCMessage(
+                    address = "/msgint",
+                    argument = OSCInt32(12305123)
+                ),
+                OSCMessage(
+                    address = "/msgblob",
+                    argument = OSCBlob(byteArrayOf(-1, 0, 1))
+                )
+            )
+        ),
+        OSCBundle(
+            time = OSCTimeTag(131231L),
+            packets = listOf(
+                OSCMessage(
+                    address = "/msgstring",
+                    argument = OSCString("bundletest")
+                ),
+                OSCBundle(
+                    time = OSCTimeTag(131231L),
+                    packets = listOf(
+                        OSCMessage(
+                            address = "/msgstring",
+                            argument = OSCString("bundletest")
+                        ),
+                        OSCMessage(
+                            address = "/msgint",
+                            argument = OSCInt32(12305123)
+                        ),
+                        OSCMessage(
+                            address = "/msgblob",
+                            argument = OSCBlob(byteArrayOf(-1, 0, 1))
+                        )
+                    )
+                ),
+                OSCMessage(
+                    address = "/msgblob",
+                    argument = OSCBlob(byteArrayOf(-1, 0, 1))
                 )
             )
         )
