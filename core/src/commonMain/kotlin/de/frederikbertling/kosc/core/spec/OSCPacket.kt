@@ -1,4 +1,4 @@
-package io.kosc.core.spec
+package de.frederikbertling.kosc.core.spec
 
 /**
  * The unit of transmission of OSC is an OSC Packet.

@@ -1,10 +1,10 @@
-package io.kosc.core.serialization
+package de.frederikbertling.kosc.core.serialization
 
-import io.kosc.core.spec.OSCAddressPattern
-import io.kosc.core.spec.OSCBundle
-import io.kosc.core.spec.OSCMessage
-import io.kosc.core.spec.OSCPacket
-import io.kosc.core.spec.args.*
+import de.frederikbertling.kosc.core.spec.OSCAddressPattern
+import de.frederikbertling.kosc.core.spec.OSCBundle
+import de.frederikbertling.kosc.core.spec.OSCMessage
+import de.frederikbertling.kosc.core.spec.OSCPacket
+import de.frederikbertling.kosc.core.spec.args.*
 import kotlinx.io.*
 
 object OSCSerializer {
@@ -31,7 +31,6 @@ object OSCSerializer {
             when (tag) {
                 'i' -> OSCInt32(buffer.readInt())
                 's' -> buffer.readOSCString()
-                // TODO, readFloat creates a 64bit floating number on JS resulting in different values
                 'f' -> OSCFloat32(buffer.readFloat())
                 'b' -> buffer.readOSCBlob()
                 else -> throw IllegalArgumentException("Unrecognized tag: $tag")

@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
-
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
@@ -7,7 +5,7 @@ plugins {
     id("maven-publish")
 }
 
-group = "io.kosc"
+group = "de.frederikbertling.kosc"
 
 kotlin {
     jvmToolchain(17)
@@ -16,18 +14,20 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
     jvm()
-    js {
-        useEsModules()
-        browser {
-            testTask {
-                useKarma {
-                    useChromeHeadless()
-                    useSafari()
-                    useFirefoxHeadless()
-                }
-            }
-        }
-    }
+    // TODO JS does not work on Float arithmetics yet
+    // https://youtrack.jetbrains.com/issue/KT-24975/Enforce-range-of-Float-type-in-JS
+//    js {
+//        useEsModules()
+//        browser {
+//            testTask {
+//                useKarma {
+//                    useChromeHeadless()
+//                    //useSafari()
+//                    //useFirefoxHeadless()
+//                }
+//            }
+//        }
+//    }
     iosX64()
     iosArm64()
     iosSimulatorArm64()
@@ -62,7 +62,7 @@ kotlin {
 }
 
 android {
-    namespace = "io.kosc.core"
+    namespace = "de.frederikbertling.kosc.core"
     compileSdk = 34
     defaultConfig {
         minSdk = 21

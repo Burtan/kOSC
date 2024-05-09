@@ -1,4 +1,4 @@
-package io.kosc.core.spec.args
+package de.frederikbertling.kosc.core.spec.args
 
 /**
  * An int32 size count, followed by that many 8-bit bytes of arbitrary binary data, followed by 0-3 additional zero

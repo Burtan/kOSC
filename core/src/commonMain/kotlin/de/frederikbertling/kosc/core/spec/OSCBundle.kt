@@ -1,6 +1,6 @@
-package io.kosc.core.spec
+package de.frederikbertling.kosc.core.spec
 
-import io.kosc.core.spec.args.OSCTimeTag
+import de.frederikbertling.kosc.core.spec.args.OSCTimeTag
 
 /**
  * An OSC Bundle consists of the OSC-string “#bundle” followed by an OSC Time Tag,

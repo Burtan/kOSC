@@ -1,12 +1,12 @@
-package io.kosc.core.test.serialization
+package de.frederikbertling.kosc.core.test.serialization
 
-import io.kosc.core.serialization.OSCSerializer
-import io.kosc.core.spec.OSCMessage
-import io.kosc.core.spec.OSCPacket
-import io.kosc.core.spec.args.OSCBlob
-import io.kosc.core.spec.args.OSCFloat32
-import io.kosc.core.spec.args.OSCInt32
-import io.kosc.core.spec.args.OSCString
+import de.frederikbertling.kosc.core.serialization.OSCSerializer
+import de.frederikbertling.kosc.core.spec.OSCMessage
+import de.frederikbertling.kosc.core.spec.OSCPacket
+import de.frederikbertling.kosc.core.spec.args.OSCBlob
+import de.frederikbertling.kosc.core.spec.args.OSCFloat32
+import de.frederikbertling.kosc.core.spec.args.OSCInt32
+import de.frederikbertling.kosc.core.spec.args.OSCString
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.datatest.withData
 import io.kotest.matchers.shouldBe
