@@ -3,8 +3,10 @@ package io.kosc.core.test.serialization
 import io.kosc.core.serialization.OSCSerializer
 import io.kosc.core.spec.OSCMessage
 import io.kosc.core.spec.OSCPacket
+import io.kosc.core.spec.args.OSCBlob
 import io.kosc.core.spec.args.OSCFloat32
 import io.kosc.core.spec.args.OSCInt32
+import io.kosc.core.spec.args.OSCString
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.datatest.withData
 import io.kotest.matchers.shouldBe
@@ -13,7 +15,7 @@ import kotlinx.io.Buffer
 
 class OSCMessageTest : StringSpec() {
 
-    private val data = listOf(
+    private val msgRawData = listOf(
         // empty message
         OSCMessage("/empty") to byteArrayOf(47, 101, 109, 112, 116, 121, 0, 0, 44, 0, 0, 0),
         // FillerBeforeCommaNone
@@ -30,11 +32,34 @@ class OSCMessageTest : StringSpec() {
         OSCMessage("/float", OSCFloat32(999.9f)) to byteArrayOf(47, 102, 108, 111, 97, 116, 0, 0, 44, 102, 0, 0, 68, 121, -7, -102),
     )
 
+    private val msgData = listOf(
+        // edge cases
+        OSCMessage("/1234", OSCFloat32(Float.MIN_VALUE)),
+        OSCMessage("/1234", OSCFloat32(Float.MAX_VALUE)),
+        OSCMessage("/1234", OSCInt32(Int.MIN_VALUE)),
+        OSCMessage("/1234", OSCInt32(Int.MAX_VALUE)),
+        OSCMessage(
+            address = "/sfbi",
+            arguments = listOf(
+                OSCString("string"),
+                OSCFloat32(0.999f),
+                OSCBlob(byteArrayOf(-1, 0, 1)),
+                OSCInt32(4129312)
+            )
+        )
+    )
+
     init {
-        withData(data) { (message, stream) ->
+        withData(msgRawData) { (message, stream) ->
             val serializationResult = OSCSerializer.serialize(message)
             val deserializationResult = OSCSerializer.deserialize(stream)
             serializationResult shouldBe stream
+            deserializationResult shouldBe message
+        }
+
+        withData(msgData) { message ->
+            val serializationResult = OSCSerializer.serialize(message)
+            val deserializationResult = OSCSerializer.deserialize(serializationResult)
             deserializationResult shouldBe message
         }
     }

@@ -31,7 +31,7 @@ object OSCSerializer {
             when (tag) {
                 'i' -> OSCInt32(buffer.readInt())
                 's' -> buffer.readOSCString()
-                // TODO readFloat does not work correctly on JS
+                // TODO, readFloat creates a 64bit floating number on JS resulting in different values
                 'f' -> OSCFloat32(buffer.readFloat())
                 'b' -> buffer.readOSCBlob()
                 else -> throw IllegalArgumentException("Unrecognized tag: $tag")
@@ -50,10 +50,10 @@ object OSCSerializer {
 
     private fun readOSCBundle(buffer: Buffer): OSCBundle {
         // skip #bundle
-        buffer.skip(7)
+        buffer.readOSCString()
         val timeTag = OSCTimeTag(buffer.readLong())
         val packets = mutableListOf<OSCPacket>()
-        while (buffer.size >= 0) {
+        while (buffer.size > 0) {
             val packetSize = buffer.readInt()
             val packetBuffer = Buffer()
             buffer.readAtMostTo(packetBuffer, packetSize.toLong())
