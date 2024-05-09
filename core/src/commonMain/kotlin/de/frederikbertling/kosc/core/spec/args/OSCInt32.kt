@@ -1,4 +1,4 @@
-package io.kosc.core.spec.args
+package de.frederikbertling.kosc.core.spec.args
 
 /**
  * 32-bit big-endian two’s complement integer

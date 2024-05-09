@@ -1,6 +1,6 @@
-package io.kosc.core.spec
+package de.frederikbertling.kosc.core.spec
 
-import io.kosc.core.spec.args.OSCArgument
+import de.frederikbertling.kosc.core.spec.args.OSCArgument
 
 /**
  * An OSC message consists of an OSC Address Pattern followed by an OSC Type Tag String followed by zero or more

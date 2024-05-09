@@ -1,4 +1,4 @@
-package io.kosc.core.spec.args
+package de.frederikbertling.kosc.core.spec.args
 
 /**
  * A sequence of non-null ASCII characters followed by a null, followed by 0-3 additional null characters to make the

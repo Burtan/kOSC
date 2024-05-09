@@ -1,14 +1,14 @@
-package io.kosc.core.test.serialization
+package de.frederikbertling.kosc.core.test.serialization
 
-import io.kosc.core.serialization.OSCSerializer
-import io.kosc.core.spec.OSCBundle
-import io.kosc.core.spec.OSCMessage
-import io.kosc.core.spec.OSCPacket
-import io.kosc.core.spec.args.*
+import de.frederikbertling.kosc.core.serialization.OSCSerializer
+import de.frederikbertling.kosc.core.spec.OSCBundle
+import de.frederikbertling.kosc.core.spec.OSCMessage
+import de.frederikbertling.kosc.core.spec.OSCPacket
+import de.frederikbertling.kosc.core.spec.args.*
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.datatest.withData
 import io.kotest.matchers.shouldBe
-import kotlinx.io.Buffer
+import kotlinx.io.*
 
 
 class OSCBundleTest : StringSpec() {

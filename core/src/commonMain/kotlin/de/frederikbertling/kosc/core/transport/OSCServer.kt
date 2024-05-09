@@ -1,6 +1,6 @@
-package io.kosc.core.transport
+package de.frederikbertling.kosc.core.transport
 
-import io.kosc.core.spec.OSCPacket
+import de.frederikbertling.kosc.core.spec.OSCPacket
 import kotlinx.coroutines.flow.SharedFlow
 
 /**

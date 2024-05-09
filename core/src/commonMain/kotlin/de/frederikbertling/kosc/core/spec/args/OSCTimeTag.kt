@@ -1,4 +1,4 @@
-package io.kosc.core.spec.args
+package de.frederikbertling.kosc.core.spec.args
 
 /**
  * Time tags are represented by a 64-bit fixed point number. The first 32 bits specify the number of seconds since

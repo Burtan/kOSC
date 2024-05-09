@@ -1,4 +1,4 @@
-package io.kosc.core.spec.args
+package de.frederikbertling.kosc.core.spec.args
 
 /**
  * Atomic Data Types
