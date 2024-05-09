@@ -5,9 +5,7 @@ import io.kosc.core.spec.OSCBundle
 import io.kosc.core.spec.OSCMessage
 import io.kosc.core.spec.OSCPacket
 import io.kosc.core.spec.args.*
-import kotlinx.io.Buffer
-import kotlinx.io.readByteArray
-import kotlinx.io.writeFloat
+import kotlinx.io.*
 
 object OSCSerializer {
 
@@ -24,7 +22,29 @@ object OSCSerializer {
     }
 
     private fun readOSCMessage(buffer: Buffer): OSCMessage {
+        // read address
+        val string = buffer.readOSCString()
+        val address = OSCAddressPattern(string.value)
 
+        val typeTags = buffer.readOSCString().value.substring(1)
+        val args = typeTags.map { tag ->
+            when (tag) {
+                'i' -> OSCInt32(buffer.readInt())
+                's' -> buffer.readOSCString()
+                'f' -> OSCFloat32(buffer.readFloat())
+                'b' -> buffer.readOSCBlob()
+                else -> throw IllegalArgumentException("Unrecognized tag: $tag")
+            }
+        }
+
+        return OSCMessage(address, args)
+    }
+
+    private fun Buffer.readOSCBlob(): OSCBlob {
+        val size = readInt()
+        val byteArray = readByteArray(size)
+        skipAlign()
+        return OSCBlob(byteArray)
     }
 
     private fun readOSCBundle(buffer: Buffer): OSCBundle {
@@ -38,8 +58,34 @@ object OSCSerializer {
             buffer.readAtMostTo(packetBuffer, packetSize.toLong())
             packets.add(deserialize(packetBuffer))
         }
+        return OSCBundle(timeTag, packets)
     }
 
+    private fun Buffer.readOSCString(): OSCString {
+        val subBuffer = Buffer()
+        while (true) {
+            val byte = readByte()
+            if (byte != 0.toByte()) {
+                subBuffer.writeByte(byte)
+            } else {
+                break;
+            }
+        }
+        skipAlign()
+        return OSCString(subBuffer.readASCII())
+    }
+
+    private fun Buffer.readASCII(): String {
+        return buildString {
+            readByteArray().forEach { byte ->
+                append(Char(byte.toInt()))
+            }
+        }
+    }
+
+    private fun Buffer.skipAlign() {
+        skip(size % 4)
+    }
 
     fun serialize(obj: OSCPacket): ByteArray {
         val buffer = Buffer()
