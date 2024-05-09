@@ -68,7 +68,7 @@ object OSCSerializer {
             if (byte != 0.toByte()) {
                 subBuffer.writeByte(byte)
             } else {
-                break;
+                break
             }
         }
         skipAlign()
