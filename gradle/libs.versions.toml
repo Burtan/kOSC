@@ -3,12 +3,11 @@ agp = "8.2.2"
 coroutines = "1.8.0"
 kotlin = "1.9.24"
 kotest = "5.9.0"
-ktor = "2.3.10"
-kx-io = "0.3.3"
+ktor = "3.0.0-eap-852"
+kx-io = "0.3.4"
 
 [libraries]
 coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 kotest-assertions-core = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
 kotest-framework-engine = { group = "io.kotest", name = "kotest-framework-engine", version.ref = "kotest" }
 kotest-framework-datatest = { group = "io.kotest", name = "kotest-framework-datatest", version.ref = "kotest" }

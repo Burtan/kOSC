@@ -1,5 +1,5 @@
 rootProject.name = "kOSC"
-include("core")
+include("core", "udp")
 
 pluginManagement {
     repositories {
