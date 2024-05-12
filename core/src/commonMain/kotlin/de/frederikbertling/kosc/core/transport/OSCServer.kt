@@ -8,5 +8,5 @@ import kotlinx.coroutines.flow.SharedFlow
  */
 interface OSCServer {
     val packetFlow: SharedFlow<OSCPacket>
-    val errorsFlow: SharedFlow<Throwable>
+    val errorFlow: SharedFlow<Throwable>
 }
