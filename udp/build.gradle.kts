@@ -1,8 +1,10 @@
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotest.multiplatform)
-    id("maven-publish")
+    alias(libs.plugins.maven.publish)
 }
 
 group = "de.frederikbertling.kosc"
@@ -28,9 +30,9 @@ kotlin {
 //            }
 //        }
 //    }
-    //iosX64()
-    //iosArm64()
-    //iosSimulatorArm64()
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
 
     sourceSets {
         commonMain {
@@ -80,13 +82,36 @@ tasks.named<Test>("jvmTest") {
     useJUnitPlatform()
 }
 
-publishing {
-    repositories {
-        mavenCentral {
-            credentials {
-                username = System.getenv("MAVEN_USER")
-                password = System.getenv("MAVEN_PASSWORD")
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.DEFAULT, true)
+
+    signAllPublications()
+
+    coordinates("de.frederikbertling.kosc", "udp", "0.1.0")
+
+    pom {
+        name.set("kOSC UDP server and client implementation")
+        description.set("OSC over UDP implementation for kotlin multiplatform")
+        inceptionYear.set("2024")
+        url.set("https://github.com/burtan/kosc/")
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                distribution.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
             }
+        }
+        developers {
+            developer {
+                id.set("burtan")
+                name.set("Frederik Bertling")
+                url.set("https://github.com/burtan/")
+            }
+        }
+        scm {
+            url.set("https://github.com/burtan/kosc/")
+            connection.set("scm:git:git://github.com/burtan/kosc.git")
+            developerConnection.set("scm:git:ssh://git@github.com/burtan/kosc.git")
         }
     }
 }
