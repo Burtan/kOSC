@@ -83,11 +83,9 @@ tasks.named<Test>("jvmTest") {
 }
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.DEFAULT, true)
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, true)
 
     signAllPublications()
-
-    coordinates("de.frederikbertling.kosc", "udp", "0.1.0")
 
     pom {
         name.set("kOSC UDP server and client implementation")
