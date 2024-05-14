@@ -20,7 +20,7 @@ class OSCUDPSocketTest : StringSpec() {
 
     init {
         "OSCUDPSocket test #1" {
-            val port = Random.nextInt(8080..30000)
+            val port = Random.nextInt(8080..8090)
             val listener = OSCUDPSocket(port)
             val client = OSCUDPSocket("localhost", port)
             testClient(client, listener)
@@ -29,7 +29,7 @@ class OSCUDPSocketTest : StringSpec() {
         }
 
         "OSCUDPSocket test #2" {
-            val port = Random.nextInt(8080..30000)
+            val port = Random.nextInt(8080..8090)
             val listener = OSCUDPSocket(port)
             val client = OSCUDPSocket(InetSocketAddress("localhost", port))
             testClient(client, listener)
@@ -38,14 +38,14 @@ class OSCUDPSocketTest : StringSpec() {
         }
 
         "OSCUDPSocket test #3" {
-            val port = Random.nextInt(8080..30000)
+            val port = Random.nextInt(8080..8090)
             val listenerClient = OSCUDPSocket("localhost", port, port)
             testClient(listenerClient, listenerClient)
             listenerClient.close()
         }
 
         "OSCUDPSocket test #4" {
-            val port = Random.nextInt(8080..30000)
+            val port = Random.nextInt(8080..8090)
             val listenerClient = OSCUDPSocket(
                 localAddress = InetSocketAddress("localhost", port),
                 remoteAddress = InetSocketAddress("localhost", port)

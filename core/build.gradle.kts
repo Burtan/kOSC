@@ -81,10 +81,8 @@ tasks.named<Test>("jvmTest") {
 }
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.DEFAULT, true)
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, true)
     signAllPublications()
-
-    coordinates("de.frederikbertling.kosc", "core", "0.1.0")
 
     pom {
         name.set("kOSC core library")
