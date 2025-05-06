@@ -3,7 +3,6 @@ import com.vanniktech.maven.publish.SonatypeHost
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotest.multiplatform)
     alias(libs.plugins.maven.publish)
 }
 
@@ -45,21 +44,19 @@ kotlin {
         }
         commonTest {
             dependencies {
-                implementation(libs.kotest.framework.datatest)
-                implementation(libs.kotest.framework.engine)
-                implementation(libs.kotest.assertions.core)
+                implementation(libs.kotlin.test)
+                implementation(libs.coroutines.test)
             }
         }
 
         jvmTest {
             dependencies {
-                implementation(libs.kotest.runner.junit5)
             }
         }
 
         val androidUnitTest by getting {
             dependencies {
-                implementation(libs.kotest.runner.junit5)
+                implementation(libs.junit)
             }
         }
     }
