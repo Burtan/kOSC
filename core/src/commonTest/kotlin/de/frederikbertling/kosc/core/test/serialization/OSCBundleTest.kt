@@ -4,14 +4,17 @@ import de.frederikbertling.kosc.core.serialization.OSCSerializer
 import de.frederikbertling.kosc.core.spec.OSCBundle
 import de.frederikbertling.kosc.core.spec.OSCMessage
 import de.frederikbertling.kosc.core.spec.OSCPacket
-import de.frederikbertling.kosc.core.spec.args.*
-import io.kotest.core.spec.style.StringSpec
-import io.kotest.datatest.withData
-import io.kotest.matchers.shouldBe
-import kotlinx.io.*
+import de.frederikbertling.kosc.core.spec.args.OSCBlob
+import de.frederikbertling.kosc.core.spec.args.OSCInt32
+import de.frederikbertling.kosc.core.spec.args.OSCString
+import de.frederikbertling.kosc.core.spec.args.OSCTimeTag
+import kotlinx.coroutines.test.runTest
+import kotlinx.io.Buffer
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 
-class OSCBundleTest : StringSpec() {
+class OSCBundleTest {
 
     private val bundleData = listOf(
         OSCBundle(
@@ -72,11 +75,13 @@ class OSCBundleTest : StringSpec() {
         )
     )
 
-    init {
-        withData(bundleData) { bundle ->
+    @Test
+    fun testOscBundle() = runTest {
+        bundleData.forEach { bundle ->
             val serializationResult = OSCSerializer.serialize(bundle)
             val deserializationResult = OSCSerializer.deserialize(serializationResult)
-            deserializationResult shouldBe bundle
+
+            assertEquals(bundle, deserializationResult)
         }
     }
 

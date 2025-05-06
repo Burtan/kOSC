@@ -7,13 +7,13 @@ import de.frederikbertling.kosc.core.spec.args.OSCBlob
 import de.frederikbertling.kosc.core.spec.args.OSCFloat32
 import de.frederikbertling.kosc.core.spec.args.OSCInt32
 import de.frederikbertling.kosc.core.spec.args.OSCString
-import io.kotest.core.spec.style.StringSpec
-import io.kotest.datatest.withData
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.test.runTest
 import kotlinx.io.Buffer
+import kotlin.test.Test
 
 
-class OSCMessageTest : StringSpec() {
+class OSCMessageTest {
 
     private val msgRawData = listOf(
         // empty message
@@ -49,17 +49,20 @@ class OSCMessageTest : StringSpec() {
         )
     )
 
-    init {
-        withData(msgRawData) { (message, stream) ->
+    @Test
+    fun testOscMessage() = runTest {
+        msgRawData.forEach { (message, stream) ->
             val serializationResult = OSCSerializer.serialize(message)
             val deserializationResult = OSCSerializer.deserialize(stream)
+
             serializationResult shouldBe stream
             deserializationResult shouldBe message
         }
 
-        withData(msgData) { message ->
+        msgData.forEach { message ->
             val serializationResult = OSCSerializer.serialize(message)
             val deserializationResult = OSCSerializer.deserialize(serializationResult)
+
             deserializationResult shouldBe message
         }
     }
