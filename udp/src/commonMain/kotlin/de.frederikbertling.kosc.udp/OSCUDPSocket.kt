@@ -34,7 +34,7 @@ class OSCUDPSocket private constructor(
         portOut: Int,
         scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     ) : this(
-        localAddress = InetSocketAddress("localhost", portIn),
+        localAddress = InetSocketAddress("127.0.0.1", portIn),
         remoteAddress = InetSocketAddress(externalHost, portOut),
         noCycle = null,
         scope = scope
