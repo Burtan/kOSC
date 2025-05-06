@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get install chromium-browser epiphany-browser firefox
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
       - name: Build with Gradle
         env:
           SAFARI_BIN: epiphany-browser
@@ -38,6 +38,6 @@ jobs:
           distribution: 'temurin'
           java-version: 17
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
       - name: Build with Gradle
         run: ./gradlew build
