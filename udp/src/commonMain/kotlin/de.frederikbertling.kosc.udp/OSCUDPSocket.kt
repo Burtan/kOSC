@@ -16,6 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -25,55 +26,46 @@ import kotlinx.coroutines.launch
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 
-@Suppress("unused")
+
 class OSCUDPSocket private constructor(
     localAddress: SocketAddress?,
     remoteAddress: SocketAddress?,
-    // noCycle is only used to make the private constructor different from public constructors
-    @Suppress("UNUSED_PARAMETER")
-    noCycle: Int? = null,
-    private val scope: CoroutineScope
+    private val scope: CoroutineScope,
+    bufferCapacity: Int = 10,
 ) : OSCClient, OSCServer {
-    
-    constructor(
-        localAddress: SocketAddress,
-        remoteAddress: SocketAddress,
-        scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    ) : this(localAddress, remoteAddress, null, scope)
 
+    // constructor for sockets that send and receive.
     constructor(
-        externalHost: String,
+        remoteAddress: SocketAddress,
         portIn: Int,
-        portOut: Int,
-        scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+        scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+        bufferCapacity: Int = 10,
     ) : this(
         localAddress = InetSocketAddress("127.0.0.1", portIn),
-        remoteAddress = InetSocketAddress(externalHost, portOut),
-        noCycle = null,
-        scope = scope
+        remoteAddress = remoteAddress,
+        scope = scope,
+        bufferCapacity = bufferCapacity
     )
 
+    // constructor for sockets that only send
     constructor(
         remoteAddress: SocketAddress,
-        scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    ) : this(null, remoteAddress, null, scope)
+        scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+        bufferCapacity: Int = 10,
+    ) : this(null, remoteAddress, scope, bufferCapacity)
 
-    constructor(
-        externalHost: String,
-        portOut: Int,
-        scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    ) : this(null, InetSocketAddress(externalHost, portOut), null, scope)
-
+    // constructor for sockets that only receive
     constructor(
         portIn: Int,
-        scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    ) : this(InetSocketAddress("localhost", portIn), null, null, scope)
+        scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+        bufferCapacity: Int = 10,
+    ) : this(InetSocketAddress("localhost", portIn), null, scope, bufferCapacity)
 
+    private val isClient = remoteAddress != null
     private var clientSocketFlow = MutableStateFlow<ConnectedDatagramSocket?>(null)
     private var serverSocketFlow = MutableStateFlow<BoundDatagramSocket?>(null)
-    private val _packetFlow = MutableSharedFlow<OSCPacket>()
+    private val _packetFlow = MutableSharedFlow<OSCPacket>(0, bufferCapacity, BufferOverflow.SUSPEND)
     private val _errorFlow = MutableSharedFlow<Throwable>()
-    private val isClient = remoteAddress != null
     override val packetFlow = _packetFlow.asSharedFlow()
     override val errorFlow = _errorFlow.asSharedFlow()
 
@@ -102,8 +94,10 @@ class OSCUDPSocket private constructor(
                     .bind(localAddress)
             }
 
+            // ConnectedDatagramSocket sends and receives
             if (socket is ConnectedDatagramSocket)
                 clientSocketFlow.emit(socket)
+            // BoundDatagramSocket only receives
             else if (socket is BoundDatagramSocket)
                 serverSocketFlow.emit(socket)
 
