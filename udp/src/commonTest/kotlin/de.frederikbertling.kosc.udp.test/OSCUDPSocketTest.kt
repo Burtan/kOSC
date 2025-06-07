@@ -4,14 +4,9 @@ import de.frederikbertling.kosc.core.spec.OSCMessage
 import de.frederikbertling.kosc.core.spec.OSCPacket
 import de.frederikbertling.kosc.core.spec.args.OSCFloat32
 import de.frederikbertling.kosc.udp.OSCUDPSocket
-import io.ktor.network.sockets.InetSocketAddress
+import io.ktor.network.sockets.*
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.onSubscription
-import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.toCollection
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlin.random.Random
@@ -62,6 +57,34 @@ class OSCUDPSocketTest {
             testClient(listenerClient, listenerClient)
         }
         listenerClient.close()
+    }
+
+    @Test
+    fun testOscUdpSocket4() = runTest {
+        // test error on initiation
+
+        // invalid in port
+        assertFails {
+            OSCUDPSocket(
+                portIn = 100000
+            )
+        }
+
+        // invalid out port
+        assertFails {
+            OSCUDPSocket(
+                remoteAddress = InetSocketAddress("127.0.0.1", 100000),
+                portIn = 8008
+            )
+        }
+
+        // invalid out host
+        assertFails {
+            OSCUDPSocket(
+                remoteAddress = InetSocketAddress("fdskjbsad", 8008),
+                portIn = 8008
+            )
+        }
     }
     
     private suspend fun testClient(client: OSCUDPSocket, listener: OSCUDPSocket) = coroutineScope {

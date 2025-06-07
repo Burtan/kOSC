@@ -4,29 +4,20 @@ import de.frederikbertling.kosc.core.serialization.OSCSerializer
 import de.frederikbertling.kosc.core.spec.OSCPacket
 import de.frederikbertling.kosc.core.transport.OSCClient
 import de.frederikbertling.kosc.core.transport.OSCServer
-import io.ktor.network.selector.SelectorManager
-import io.ktor.network.sockets.BoundDatagramSocket
-import io.ktor.network.sockets.ConnectedDatagramSocket
-import io.ktor.network.sockets.Datagram
-import io.ktor.network.sockets.InetSocketAddress
-import io.ktor.network.sockets.SocketAddress
-import io.ktor.network.sockets.aSocket
-import io.ktor.network.sockets.isClosed
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.SupervisorJob
+import io.ktor.network.selector.*
+import io.ktor.network.sockets.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 
 
+/**
+ * OSCUDPSocket connects to sockets synchronously. Constructors should only be used in a
+ * suspending thread.
+ */
 class OSCUDPSocket private constructor(
     localAddress: SocketAddress?,
     remoteAddress: SocketAddress?,
@@ -62,15 +53,15 @@ class OSCUDPSocket private constructor(
     ) : this(InetSocketAddress("localhost", portIn), null, scope, bufferCapacity)
 
     private val isClient = remoteAddress != null
-    private var clientSocketFlow = MutableStateFlow<ConnectedDatagramSocket?>(null)
-    private var serverSocketFlow = MutableStateFlow<BoundDatagramSocket?>(null)
+    private var clientSocket: ConnectedDatagramSocket? = null
+    private var serverSocket: BoundDatagramSocket? = null
     private val _packetFlow = MutableSharedFlow<OSCPacket>(0, bufferCapacity, BufferOverflow.SUSPEND)
     private val _errorFlow = MutableSharedFlow<Throwable>()
     override val packetFlow = _packetFlow.asSharedFlow()
     override val errorFlow = _errorFlow.asSharedFlow()
 
     init {
-        scope.launch {
+        val socket = runBlocking {
             val selectorManager = SelectorManager(Dispatchers.IO)
             val socket = if (localAddress != null && remoteAddress != null) {
                 // server and client
@@ -96,11 +87,15 @@ class OSCUDPSocket private constructor(
 
             // ConnectedDatagramSocket sends and receives
             if (socket is ConnectedDatagramSocket)
-                clientSocketFlow.emit(socket)
+                clientSocket = socket
             // BoundDatagramSocket only receives
             else if (socket is BoundDatagramSocket)
-                serverSocketFlow.emit(socket)
+                serverSocket = socket
 
+            socket
+        }
+
+        scope.launch {
             while (!socket.isClosed) {
                 try {
                     val datagram = socket
@@ -129,7 +124,6 @@ class OSCUDPSocket private constructor(
             )
 
         scope.launch {
-            val clientSocket = clientSocketFlow.filterNotNull().first()
             try {
                 val data = OSCSerializer.serialize(packet)
                 val datagram = Datagram(
@@ -137,9 +131,9 @@ class OSCUDPSocket private constructor(
                         .apply {
                             write(data)
                         },
-                    address = clientSocket.remoteAddress
+                    address = clientSocket!!.remoteAddress
                 )
-                clientSocket.send(datagram)
+                clientSocket!!.send(datagram)
             } catch (e: Throwable) {
                 _errorFlow.emit(e)
             }
@@ -148,12 +142,10 @@ class OSCUDPSocket private constructor(
 
     fun close() {
         scope.launch {
-            val clientSocket = clientSocketFlow.filterNotNull().first()
-            clientSocket.close()
+            clientSocket?.close()
         }
         scope.launch {
-            val serverSocket = serverSocketFlow.filterNotNull().first()
-            serverSocket.close()
+            serverSocket?.close()
         }
     }
 }
