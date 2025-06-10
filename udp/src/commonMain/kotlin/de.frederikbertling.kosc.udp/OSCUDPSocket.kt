@@ -18,10 +18,10 @@ import kotlinx.io.readByteArray
  * OSCUDPSocket connects to sockets synchronously. Constructors should only be used in a
  * suspending thread.
  */
-class OSCUDPSocket private constructor(
+class OSCUDPSocket(
     localAddress: SocketAddress?,
     remoteAddress: SocketAddress?,
-    private val scope: CoroutineScope,
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
     bufferCapacity: Int = 10,
 ) : OSCClient, OSCServer {
 
@@ -50,12 +50,21 @@ class OSCUDPSocket private constructor(
         portIn: Int,
         scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
         bufferCapacity: Int = 10,
-    ) : this(InetSocketAddress("localhost", portIn), null, scope, bufferCapacity)
+    ) : this(
+        localAddress = InetSocketAddress("127.0.0.1", portIn),
+        remoteAddress = null,
+        scope=  scope,
+        bufferCapacity = bufferCapacity
+    )
 
     private val isClient = remoteAddress != null
     private var clientSocket: ConnectedDatagramSocket? = null
     private var serverSocket: BoundDatagramSocket? = null
-    private val _packetFlow = MutableSharedFlow<OSCPacket>(0, bufferCapacity, BufferOverflow.SUSPEND)
+    private val _packetFlow = MutableSharedFlow<OSCPacket>(
+        0,
+        bufferCapacity,
+        BufferOverflow.SUSPEND
+    )
     private val _errorFlow = MutableSharedFlow<Throwable>()
     override val packetFlow = _packetFlow.asSharedFlow()
     override val errorFlow = _errorFlow.asSharedFlow()
