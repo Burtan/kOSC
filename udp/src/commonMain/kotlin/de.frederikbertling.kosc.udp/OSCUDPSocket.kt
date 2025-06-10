@@ -32,7 +32,7 @@ class OSCUDPSocket(
         scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
         bufferCapacity: Int = 10,
     ) : this(
-        localAddress = InetSocketAddress("127.0.0.1", portIn),
+        localAddress = InetSocketAddress("0.0.0.0", portIn),
         remoteAddress = remoteAddress,
         scope = scope,
         bufferCapacity = bufferCapacity
@@ -51,7 +51,7 @@ class OSCUDPSocket(
         scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
         bufferCapacity: Int = 10,
     ) : this(
-        localAddress = InetSocketAddress("127.0.0.1", portIn),
+        localAddress = InetSocketAddress("0.0.0.0", portIn),
         remoteAddress = null,
         scope=  scope,
         bufferCapacity = bufferCapacity
