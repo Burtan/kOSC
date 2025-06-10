@@ -36,7 +36,7 @@ class OSCUDPSocketTest {
 
     @Test
     fun testOscUdpSocket2() = runTest {
-        // test sockets with receiving and sending functions
+        // test sockets with receiving and sending functions. Short constructor.
         val port = Random.nextInt(8080..8090)
         val listenerClient = OSCUDPSocket(
             remoteAddress = InetSocketAddress("127.0.0.1", port),
@@ -48,7 +48,19 @@ class OSCUDPSocketTest {
 
     @Test
     fun testOscUdpSocket3() = runTest {
-        // test error when trying to send from only receiving sockets
+        // Test sockets with receiving and sending functions. Full constructor.
+        val port = Random.nextInt(8080..8090)
+        val listenerClient = OSCUDPSocket(
+            localAddress = InetSocketAddress("127.0.0.1", port),
+            remoteAddress = InetSocketAddress("127.0.0.1", port),
+        )
+        testClient(listenerClient, listenerClient)
+        listenerClient.close()
+    }
+
+    @Test
+    fun testOscUdpSocket4() = runTest {
+        // Test error when trying to send from only receiving sockets.
         val port = Random.nextInt(8080..8090)
         val listenerClient = OSCUDPSocket(
             portIn = port
@@ -60,7 +72,7 @@ class OSCUDPSocketTest {
     }
 
     @Test
-    fun testOscUdpSocket4() = runTest {
+    fun testOscUdpSocket5() = runTest {
         // test error on initiation
 
         // invalid in port
