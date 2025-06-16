@@ -126,35 +126,27 @@ class OSCUDPSocket(
         }
     }
 
-    override fun send(packet: OSCPacket) {
-        if (!isClient)
+    override suspend fun send(packet: OSCPacket) {
+        if (!isClient) {
             throw IllegalArgumentException(
                 "$this is not configured to be an OSC client. Add a remote address."
             )
-
-        scope.launch {
-            try {
-                val data = OSCSerializer.serialize(packet)
-                val datagram = Datagram(
-                    packet = Buffer()
-                        .apply {
-                            write(data)
-                        },
-                    address = clientSocket!!.remoteAddress
-                )
-                clientSocket!!.send(datagram)
-            } catch (e: Throwable) {
-                _errorFlow.emit(e)
-            }
         }
+
+        val data = OSCSerializer.serialize(packet)
+        val datagram = Datagram(
+            packet = Buffer()
+                .apply {
+                    write(data)
+                },
+            address = clientSocket!!.remoteAddress
+        )
+        clientSocket!!.send(datagram)
     }
 
     fun close() {
-        scope.launch {
-            clientSocket?.close()
-        }
-        scope.launch {
-            serverSocket?.close()
-        }
+        clientSocket?.close()
+        serverSocket?.close()
     }
+
 }
