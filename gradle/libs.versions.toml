@@ -7,6 +7,10 @@ kx-io = "0.8.0"
 maven-publish = "0.33.0"
 junit = "4.13.2"
 kotest = "5.9.1"
+ax-test-runner = "1.6.2"
+ax-test-rules = "1.6.1"
+ax-test-core = "1.6.1"
+ax-test-uiautomator = "2.3.0"
 
 [libraries]
 coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -16,7 +20,8 @@ kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.re
 coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 kotest-assertion = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
-
+ax-test-runner = { group = "androidx.test", name = "runner", version.ref = "ax-test-runner" }
+ax-test-core = { group = "androidx.test", name = "core-ktx", version.ref = "ax-test-core" }
 [plugins]
 android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
