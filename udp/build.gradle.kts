@@ -54,9 +54,19 @@ kotlin {
             }
         }
 
-        val androidUnitTest by getting {
+        androidUnitTest {
             dependencies {
                 implementation(libs.junit)
+            }
+        }
+
+        androidInstrumentedTest {
+            dependencies {
+                implementation(libs.junit)
+                implementation(libs.coroutines.test)
+                implementation(libs.kotlin.test)
+                implementation(libs.ax.test.runner)
+                implementation(libs.ax.test.core)
             }
         }
     }
@@ -67,10 +77,20 @@ android {
     compileSdk = 34
     defaultConfig {
         minSdk = 21
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     testOptions {
-        unitTests.all {
-            it.useJUnitPlatform()
+        managedDevices {
+            localDevices {
+                create("pixel8api34") {
+                    device = "Pixel 8"
+                    apiLevel = 34
+                    systemImageSource = "google"
+                }
+            }
+        }
+        unitTests {
+            isIncludeAndroidResources = true
         }
     }
 }
