@@ -9,7 +9,7 @@ junit = "4.13.2"
 kotest = "5.9.1"
 ax-test-runner = "1.7.0"
 ax-test-rules = "1.6.1"
-ax-test-core = "1.6.1"
+ax-test-core = "1.7.0"
 ax-test-uiautomator = "2.3.0"
 
 [libraries]
