@@ -9,4 +9,5 @@ import kotlinx.coroutines.flow.SharedFlow
 interface OSCServer {
     val packetFlow: SharedFlow<OSCPacket>
     val errorFlow: SharedFlow<Throwable>
+    fun close()
 }
