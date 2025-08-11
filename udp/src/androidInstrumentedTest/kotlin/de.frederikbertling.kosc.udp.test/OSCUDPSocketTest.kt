@@ -1,27 +1,21 @@
 package de.frederikbertling.kosc.udp.test
 
-import androidx.test.filters.LargeTest
 import de.frederikbertling.kosc.core.spec.OSCMessage
 import de.frederikbertling.kosc.core.spec.OSCPacket
 import de.frederikbertling.kosc.core.spec.args.OSCFloat32
-import de.frederikbertling.kosc.udp.OSCUDPSocket
-import io.ktor.network.sockets.InetSocketAddress
+import de.frederikbertling.kosc.udp.OSCUDPClient
+import de.frederikbertling.kosc.udp.OSCUDPServer
+import io.ktor.network.sockets.*
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.onSubscription
-import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.toCollection
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
-import org.junit.Test
 import kotlin.random.Random
 import kotlin.random.nextInt
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
 
-@LargeTest
 class OSCUDPSocketTest {
 
     private val testPacket = OSCMessage("/test", OSCFloat32(1.93127f))
@@ -30,10 +24,10 @@ class OSCUDPSocketTest {
     fun testOscUdpSocket1() = runTest {
         // test sockets with only receiving and only sending functions
         val port = Random.nextInt(8080..8090)
-        val listener = OSCUDPSocket(
-            portIn = port
+        val listener = OSCUDPServer(
+            port = port
         )
-        val client = OSCUDPSocket(
+        val client = OSCUDPClient(
             remoteAddress = InetSocketAddress("127.0.0.1", port)
         )
         testClient(client, listener)
@@ -43,70 +37,31 @@ class OSCUDPSocketTest {
 
     @Test
     fun testOscUdpSocket2() = runTest {
-        // test sockets with receiving and sending functions. Short constructor.
-        val port = Random.nextInt(8080..8090)
-        val listenerClient = OSCUDPSocket(
-            remoteAddress = InetSocketAddress("127.0.0.1", port),
-            portIn = port
-        )
-        testClient(listenerClient, listenerClient)
-        listenerClient.close()
-    }
-
-    @Test
-    fun testOscUdpSocket3() = runTest {
-        // Test sockets with receiving and sending functions. Full constructor.
-        val port = Random.nextInt(8080..8090)
-        val listenerClient = OSCUDPSocket(
-            localAddress = InetSocketAddress("127.0.0.1", port),
-            remoteAddress = InetSocketAddress("127.0.0.1", port),
-        )
-        testClient(listenerClient, listenerClient)
-        listenerClient.close()
-    }
-
-    @Test
-    fun testOscUdpSocket4() = runTest {
-        // Test error when trying to send from only receiving sockets.
-        val port = Random.nextInt(8080..8090)
-        val listenerClient = OSCUDPSocket(
-            portIn = port
-        )
-        assertFails {
-            testClient(listenerClient, listenerClient)
-        }
-        listenerClient.close()
-    }
-
-    @Test
-    fun testOscUdpSocket5() = runTest {
         // test error on initiation
 
         // invalid in port
         assertFails {
-            OSCUDPSocket(
-                portIn = 100000
+            OSCUDPServer(
+                port = 100000
             )
         }
 
         // invalid out port
         assertFails {
-            OSCUDPSocket(
+            OSCUDPClient(
                 remoteAddress = InetSocketAddress("127.0.0.1", 100000),
-                portIn = 8008
             )
         }
 
         // invalid out host
         assertFails {
-            OSCUDPSocket(
+            OSCUDPClient(
                 remoteAddress = InetSocketAddress("fdskjbsad", 8008),
-                portIn = 8008
             )
         }
     }
-    
-    private suspend fun testClient(client: OSCUDPSocket, listener: OSCUDPSocket) = coroutineScope {
+
+    private suspend fun testClient(client: OSCUDPClient, listener: OSCUDPServer) = coroutineScope {
         val packets = mutableListOf<OSCPacket>()
 
         val isCollectingFlow = MutableStateFlow(false)

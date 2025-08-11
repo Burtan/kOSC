@@ -7,4 +7,5 @@ import de.frederikbertling.kosc.core.spec.OSCPacket
  */
 interface OSCClient {
     suspend fun send(packet: OSCPacket)
+    fun close()
 }
