@@ -16,7 +16,7 @@ import kotlinx.io.Buffer
  * suspending thread.
  */
 class OSCUDPClient(
-    remoteAddress: SocketAddress,
+    val remoteAddress: SocketAddress,
 ) : OSCClient {
 
     private var clientSocket: ConnectedDatagramSocket? = null
