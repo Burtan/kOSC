@@ -98,6 +98,24 @@ class OSCUDPSocketTest {
             )
         }
     }
+
+    @Test
+    fun testOscUdpSocket6() = runTest {
+        // Test sockets with receiving and sending functions. Full constructor.
+        val port1 = Random.nextInt(8080..8089)
+        val port2 = Random.nextInt(8090..8099)
+        val listenerClient1 = OSCUDPSocket(
+            localAddress = InetSocketAddress("127.0.0.1", port1),
+            remoteAddress = InetSocketAddress("127.0.0.1", port2),
+        )
+        val listenerClient2 = OSCUDPSocket(
+            localAddress = InetSocketAddress("127.0.0.1", port2),
+            remoteAddress = InetSocketAddress("127.0.0.1", port1),
+        )
+        testClient(listenerClient1, listenerClient2)
+        listenerClient1.close()
+        listenerClient2.close()
+    }
     
     private suspend fun testClient(client: OSCUDPSocket, listener: OSCUDPSocket) = coroutineScope {
         val packets = mutableListOf<OSCPacket>()

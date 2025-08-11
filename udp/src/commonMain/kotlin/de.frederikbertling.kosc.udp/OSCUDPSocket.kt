@@ -72,39 +72,28 @@ class OSCUDPSocket(
     init {
         val socket = runBlocking {
             val selectorManager = SelectorManager(Dispatchers.IO)
-            val socket = if (localAddress != null && remoteAddress != null) {
-                // server and client
-                aSocket(selectorManager)
+
+            if (remoteAddress != null) {
+                clientSocket = aSocket(selectorManager)
                     .udp()
-                    .connect(
-                        localAddress = localAddress,
-                        remoteAddress = remoteAddress,
-                    )
-            } else if (remoteAddress != null) {
-                // only client
-                aSocket(selectorManager)
-                    .udp()
-                    .connect(
-                        remoteAddress = remoteAddress
-                    )
-            } else {
-                // only server
-                aSocket(selectorManager)
+                    .connect(remoteAddress)
+            }
+            if (localAddress != null) {
+                val socket = aSocket(selectorManager)
                     .udp()
                     .bind(localAddress)
-            }
 
-            // ConnectedDatagramSocket sends and receives
-            if (socket is ConnectedDatagramSocket)
-                clientSocket = socket
-            // BoundDatagramSocket only receives
-            else if (socket is BoundDatagramSocket)
                 serverSocket = socket
-
-            socket
+                socket
+            } else {
+                null
+            }
         }
 
         scope.launch {
+            if (socket == null)
+                return@launch
+
             while (!socket.isClosed) {
                 try {
                     val datagram = socket
