@@ -18,9 +18,9 @@ import kotlinx.io.readByteArray
  * suspending thread.
  */
 class OSCUDPServer(
-    port: Int,
-    scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
-    bufferCapacity: Int = 10,
+    val port: Int,
+    val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+    val bufferCapacity: Int = 10,
 ) : OSCServer {
 
     private var socket: BoundDatagramSocket? = null
