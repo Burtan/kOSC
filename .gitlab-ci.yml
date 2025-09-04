@@ -7,7 +7,7 @@ stages:
 
 .android-job:
   when: always
-  image: cimg/android:2025.08.1
+  image: cimg/android:2025.09.1
   tags:
     - linux
   before_script:
