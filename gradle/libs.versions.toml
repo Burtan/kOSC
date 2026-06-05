@@ -1,5 +1,5 @@
 [versions]
-agp = "8.13.2"
+agp = "9.2.1"
 coroutines = "1.11.0"
 kotlin = "2.4.0"
 ktor = "3.5.0"
@@ -22,7 +22,8 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 kotest-assertion = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
 ax-test-runner = { group = "androidx.test", name = "runner", version.ref = "ax-test-runner" }
 ax-test-core = { group = "androidx.test", name = "core-ktx", version.ref = "ax-test-core" }
+
 [plugins]
-android-library = { id = "com.android.library", version.ref = "agp" }
+android-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }

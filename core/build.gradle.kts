@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.android.multiplatform.library)
     alias(libs.plugins.maven.publish)
 }
 
@@ -9,8 +9,10 @@ group = "de.frederikbertling.kosc"
 kotlin {
     jvmToolchain(17)
 
-    androidTarget {
-        publishLibraryVariants("release", "debug")
+    android {
+        namespace = "de.frederikbertling.kosc.core"
+        compileSdk = 34
+        withHostTest {}
     }
     jvm()
     // TODO JS does not work on Float arithmetics yet
@@ -51,23 +53,9 @@ kotlin {
             }
         }
 
-        androidUnitTest {
-            dependencies {
-                implementation(libs.junit)
-            }
-        }
-    }
-}
-
-android {
-    namespace = "de.frederikbertling.kosc.core"
-    compileSdk = 34
-    defaultConfig {
-        minSdk = 21
-    }
-    testOptions {
-        unitTests.all {
-            it.useJUnitPlatform()
+        val androidHostTest = findByName("androidHostTest")
+        androidHostTest?.dependencies {
+            implementation(libs.junit)
         }
     }
 }

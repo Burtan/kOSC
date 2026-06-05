@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.android.multiplatform.library)
     alias(libs.plugins.maven.publish)
 }
 
@@ -9,8 +9,24 @@ group = "de.frederikbertling.kosc"
 kotlin {
     jvmToolchain(17)
 
-    androidTarget {
-        publishLibraryVariants("release", "debug")
+    android {
+        namespace = "de.frederikbertling.kosc.udp"
+        compileSdk = 34
+        withDeviceTest {
+            managedDevices {
+                localDevices {
+                    create("pixel8api34") {
+                        device = "Pixel 8"
+                        apiLevel = 34
+                        systemImageSource = "google"
+                    }
+                }
+
+            }
+        }
+        withHostTest {
+            isIncludeAndroidResources = true
+        }
     }
     jvm()
     // TODO JS does not work on Float arithmetics yet
@@ -52,43 +68,18 @@ kotlin {
             }
         }
 
-        androidUnitTest {
-            dependencies {
-                implementation(libs.junit)
-            }
+        val androidHostTest = findByName("androidHostTest")
+        androidHostTest?.dependencies {
+            implementation(libs.junit)
         }
 
-        androidInstrumentedTest {
-            dependencies {
-                implementation(libs.junit)
-                implementation(libs.coroutines.test)
-                implementation(libs.kotlin.test)
-                implementation(libs.ax.test.runner)
-                implementation(libs.ax.test.core)
-            }
-        }
-    }
-}
-
-android {
-    namespace = "de.frederikbertling.kosc.udp"
-    compileSdk = 34
-    defaultConfig {
-        minSdk = 21
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-    testOptions {
-        managedDevices {
-            localDevices {
-                create("pixel8api34") {
-                    device = "Pixel 8"
-                    apiLevel = 34
-                    systemImageSource = "google"
-                }
-            }
-        }
-        unitTests {
-            isIncludeAndroidResources = true
+        val androidDeviceTest = findByName("androidDeviceTest")
+        androidDeviceTest?.dependencies {
+            implementation(libs.junit)
+            implementation(libs.coroutines.test)
+            implementation(libs.kotlin.test)
+            implementation(libs.ax.test.runner)
+            implementation(libs.ax.test.core)
         }
     }
 }
