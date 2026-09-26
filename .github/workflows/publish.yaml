@@ -16,7 +16,7 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
-          java-version: 26
+          java-version: 27
       - name: Publish
         run: |
           NEW_VERSION=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
