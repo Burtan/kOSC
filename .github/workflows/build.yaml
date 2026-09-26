@@ -15,7 +15,7 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
-          java-version: 26
+          java-version: 27
       - name: Update dependencies
         run: sudo apt-get update
       - name: Install dependencies
@@ -36,7 +36,7 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
-          java-version: 26
+          java-version: 27
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
       - name: Build with Gradle
