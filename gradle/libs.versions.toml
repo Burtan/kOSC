@@ -1,7 +1,7 @@
 [versions]
 agp = "9.4.1"
 coroutines = "1.11.0"
-kotlin = "2.4.20"
+kotlin = "2.4.21"
 ktor = "3.6.0"
 kx-io = "0.9.1"
 maven-publish = "0.37.0"
